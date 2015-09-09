@@ -29,7 +29,7 @@ var Enemy = function() {
 };
 
 /*
- * Make the enemy a subclass of the Character object
+ * Make the enemy a subclass of the Entity object
  * and set the prototype for the object accordingly
  */
 Enemy.prototype = Object.create(Entity.prototype);

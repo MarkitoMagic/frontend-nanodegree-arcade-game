@@ -4,7 +4,6 @@
  * The main screen that will great the user and handleInput.
  */
 var MainMenu = function (stateIndex) {
-    console.log('Main Menu State');
     this.background = 'images/title-background.png';
     this.titleLogo = 'images/Bug-Crossing.png';
     this.enterText = 'images/Press-Enter.png';
@@ -17,8 +16,8 @@ var MainMenu = function (stateIndex) {
 MainMenu.prototype = Object.create(State.prototype);
 MainMenu.prototype.constructor = MainMenu;
 
-/*
- * Render the main menu (and title screen)
+
+/* Render the main menu (and title screen)
  */
 MainMenu.prototype.render = function(ctx) {
     if (ctx) {
@@ -33,8 +32,7 @@ MainMenu.prototype.render = function(ctx) {
     }
 };
 
-/*
- * Make updates to this game state based on the time delta
+/* Make updates to this game state based on the time delta
  * received in the state
  */
 MainMenu.prototype.update = function (dt) {
@@ -53,9 +51,10 @@ MainMenu.prototype.update = function (dt) {
         this.alphaValue+=(this.alphaDirection * dt);
     }
 };
-
+/* Handles user input which in this case will navigate the user
+ * to the next state of the application.
+ */
 MainMenu.prototype.handleInput = function (key) {
-    console.log('I got the key broooo: ' + key);
     if (key === 13) {
         game.stateIndex = gameState.LIVE_GAME;
     }

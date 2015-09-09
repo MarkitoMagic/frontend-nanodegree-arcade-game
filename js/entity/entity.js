@@ -1,7 +1,7 @@
 /**
  * Enenmy / Player / Game Object base class
  */
-var Entity = function() {
+var Entity = function () {
     this.x = 0;
     this.y = 0;
     this.sprite = '';
@@ -11,8 +11,13 @@ var Entity = function() {
  * Render method is the default method
  * for drawing the game object on the screen
  */
-Entity.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+Entity.prototype.render = function () {
+    // if the entity psuedo-class specifies h/w, use those params
+    if (this.w && this.h) {
+        ctx.drawImage(Resources.get(this.sprite), this.x, this.y, this.w, this.h);
+    } else {
+        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    }
 
     if (gameConstants.debug && this.boundingBox) {
 
@@ -30,7 +35,7 @@ Entity.prototype.render = function() {
 /**
  * Convenience method to access the bounding box for an entity
  */
-Entity.prototype.getBoundingBox = function() {
+Entity.prototype.getBoundingBox = function () {
     // Default bounding box dimensions
     var box = {
         x: 0,

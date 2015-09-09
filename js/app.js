@@ -14,6 +14,11 @@ var gameConstants = {
     enemy: {
         width: 101
     },
+    gem: {
+        width: 101,
+        yOffSet: 25,
+        xOffSet: 15
+    },
     debug: true,
     keys: {
         LEFT: 'left',

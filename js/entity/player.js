@@ -2,7 +2,7 @@
  * Player class that represents the main character
  * of the game.
  */
-var Player = function() {
+var Player = function () {
     // Default player Representation
     this.sprite = 'images/char-boy.png';
     // Default player coordinates
@@ -19,7 +19,7 @@ var Player = function() {
 };
 
 /*
- * Make the player a subclass of the Character object
+ * Make the player a subclass of the Entity object
  * and set the prototype for the object accordingly
  */
 Player.prototype = Object.create(Entity.prototype);
@@ -28,8 +28,8 @@ Player.prototype.constructor = Player;
 /**
  * Define the player prototype (although, in THIS version it's a one player game)
  */
-Player.prototype.update = function(dt) {
-    //do something here with dt
+Player.prototype.update = function( dt) {
+    //noop()
 };
 
 
@@ -38,7 +38,7 @@ Player.prototype.update = function(dt) {
  * to allow the player to control the
  * character
  */
- Player.prototype.handleInput = function(key) {
+ Player.prototype.handleInput = function (key) {
      // Get a reference to the sprite for the character image
      var heroSprite = Resources.get(this.sprite);
      var heroWidth = heroSprite.height;

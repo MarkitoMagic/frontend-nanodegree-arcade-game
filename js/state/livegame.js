@@ -7,6 +7,36 @@
 var LiveGame = function () {
     this.gameClock = 60;
     this.gameOver = false;
+    this.allGems = [];
+
+    // Create gem objects
+    createGem(1, this.allGems);
+    createGem(2, this.allGems);
+    createGem(3, this.allGems);
+
+    function createGem(type, gemArray) {
+        var tmp = new Gem(type);
+        var conflict;
+        var i;
+
+        do {
+            conflict = false;
+
+            // Check to see if any other gems have the same coords
+            for (i = 0; i < gemArray.length; i++) {
+                if (tmp.x === gemArray[i].x && tmp.y === gemArray[i].y) {
+                    conflict = true;
+                    break;
+                }
+            }
+            if (conflict) {
+                tmp = new Gem(type);
+            } else {
+                gemArray.push(tmp);
+                break;
+            }
+        } while (conflict);
+    }
 };
 /* Assign the constructor and prototype for this psuedo-class */
 LiveGame.prototype = Object.create(State.prototype);
@@ -16,8 +46,10 @@ LiveGame.prototype.constructor = LiveGame;
  * componenets for an actual gameplay level. These updates include
  * updating the game clock, enemy management and collision detection.
  */
-LiveGame.prototype.update = function(dt) {
-    if (!this.gameOver) {
+LiveGame.prototype.update = function (dt) {
+    var that = this;
+
+    if (!that.gameOver) {
         updateGameClock(dt);
         sendWaveOfEnemies();
         updateEntities(dt);
@@ -29,15 +61,11 @@ LiveGame.prototype.update = function(dt) {
      * level
      */
     function updateGameClock(dt) {
-        var clock = game.currentState.gameClock;
-
-        if (clock > 0) {
-            clock = clock - dt;
+        if (that.gameClock > 0) {
+            that.gameClock = that.gameClock - dt;
         } else {
-            // GAME OVER
-            this.isGameOver = true;
+            that.gameOver = true;
         }
-        game.currentState.gameClock = clock;
     }
 
     /* This function determines whether or not to send
@@ -84,6 +112,12 @@ LiveGame.prototype.update = function(dt) {
                 player.x = gameConstants.player.startX;
                 player.y = gameConstants.player.startY;
             };
+        })
+        that.allGems.forEach(function (gem, index) {
+            if (isCollision(player.getBoundingBox(), gem.getBoundingBox())) {
+                that.allGems.splice(index, 1);
+                player.score+=1000;
+            }
         });
     }
 
@@ -105,7 +139,8 @@ LiveGame.prototype.update = function(dt) {
 /* State specific render logic which draws the backgrounds, characters,
  * score, game clock etc.
  */
-LiveGame.prototype.render = function(ctx) {
+LiveGame.prototype.render = function (ctx) {
+    var that = this;
     /*
      * clear the canvas before drawing again
      */
@@ -144,8 +179,7 @@ LiveGame.prototype.render = function(ctx) {
 
     ctx.font = '50px impact';
     // Display the current game clock
-    var clock = game.currentState.gameClock;
-    var displayTime = clock > 0 ? Math.abs(Math.floor(clock)) : 0;
+    var displayTime = that.gameClock > 0 ? Math.abs(Math.floor(that.gameClock)) : 0;
     ctx.fillText(displayTime, 0, 40);
 
     // Display the current player score
@@ -175,10 +209,26 @@ LiveGame.prototype.render = function(ctx) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-        allEnemies.forEach(function(enemy) {
+        allEnemies.forEach(function (enemy) {
             enemy.render();
         });
 
+        that.allGems.forEach(function (gem) {
+            gem.render();
+        });
         player.render();
+    }
+};
+
+LiveGame.prototype.handleInput = function (key) {
+    var allowedKeys = {
+        37: 'left',
+        38: 'up',
+        39: 'right',
+        40: 'down'
+    };
+
+    if (!this.gameOver) {
+        player.handleInput(allowedKeys[key]);
     }
 };
