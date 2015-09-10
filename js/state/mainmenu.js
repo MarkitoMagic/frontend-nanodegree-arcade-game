@@ -56,6 +56,6 @@ MainMenu.prototype.update = function (dt) {
  */
 MainMenu.prototype.handleInput = function (key) {
     if (key === 13) {
-        game.stateIndex = gameState.LIVE_GAME;
+        game.stateIndex = gameState.AVATAR_SELECT;
     }
 };

@@ -3,41 +3,64 @@
  * The game state that will house the primary objectives of the game and handle
  * the user and handleInput.
  */
-
 var LiveGame = function () {
-    this.gameClock = 60;
-    this.gameOver = false;
-    this.allGems = [];
+    liveGameUtils.init.call(this);
+};
 
-    // Create gem objects
-    createGem(1, this.allGems);
-    createGem(2, this.allGems);
-    createGem(3, this.allGems);
+// Utils object to no polute the namespace with another function named init
+var liveGameUtils = {
+    init: function () {
+        this.gameClock = 60;
+        this.gameOver = false;
+        this.allGems = [];
+        this.paused = false;
 
-    function createGem(type, gemArray) {
-        var tmp = new Gem(type);
-        var conflict;
-        var i;
+        /*
+         * All of the enemies for the game will be stored in this array
+         */
+        this.allEnemies = [];
 
-        do {
-            conflict = false;
+        /*
+         * The main player object
+         */
+        this.player = new Player();
+        this.player.score = 0;
+        this.player.x = gameConstants.player.startX;
+        this.player.y = gameConstants.player.startY;
 
-            // Check to see if any other gems have the same coords
-            for (i = 0; i < gemArray.length; i++) {
-                if (tmp.x === gemArray[i].x && tmp.y === gemArray[i].y) {
-                    conflict = true;
+        // Create gem objects
+        createGem(1, this.allGems);
+        createGem(2, this.allGems);
+        createGem(3, this.allGems);
+        this.key = new Key();
+
+        //This helper function aides in preventing gems from generating in the same place
+        function createGem(type, gemArray) {
+            var tmp = new Gem(type);
+            var conflict;
+            var i;
+
+            do {
+                conflict = false;
+
+                // Check to see if any other gems have the same coords
+                for (i = 0; i < gemArray.length; i++) {
+                    if (tmp.x === gemArray[i].x && tmp.y === gemArray[i].y) {
+                        conflict = true;
+                        break;
+                    }
+                }
+                if (conflict) {
+                    tmp = new Gem(type);
+                } else {
+                    gemArray.push(tmp);
                     break;
                 }
-            }
-            if (conflict) {
-                tmp = new Gem(type);
-            } else {
-                gemArray.push(tmp);
-                break;
-            }
-        } while (conflict);
+            } while (conflict);
+        }
     }
 };
+
 /* Assign the constructor and prototype for this psuedo-class */
 LiveGame.prototype = Object.create(State.prototype);
 LiveGame.prototype.constructor = LiveGame;
@@ -49,12 +72,31 @@ LiveGame.prototype.constructor = LiveGame;
 LiveGame.prototype.update = function (dt) {
     var that = this;
 
-    if (!that.gameOver) {
-        updateGameClock(dt);
+    if (!that.gameOver && !that.paused) {
         sendWaveOfEnemies();
         updateEntities(dt);
         checkCollisions();
         pruneEnemies();
+    }
+
+    // If the game is paused, we want to handle timelapse differently
+    if (!that.paused && !that.gameOver) {
+        updateGameClock(dt);
+    } else {
+        updateGameClock(0);
+    }
+
+    if (that.gameOver) {
+        // If they won the game then set the winner status
+        // for the game state
+        if (that.gameClock > 0 && that.player.lives > 0) {
+            game.winner = true;
+        } else {
+            game.winner = false;
+        }
+        //transition the game over state
+        this.reset();
+        game.stateIndex = gameState.GAME_OVER;
     }
 
     /* This function updates the game clock for the
@@ -72,8 +114,8 @@ LiveGame.prototype.update = function (dt) {
      * more enemies to attack the user
      */
     function sendWaveOfEnemies() {
-        if (allEnemies.length < 3) {
-            allEnemies.push(new Enemy());
+        if (that.allEnemies.length < 3) {
+            that.allEnemies.push(new Enemy());
         }
     }
 
@@ -83,10 +125,10 @@ LiveGame.prototype.update = function (dt) {
      * player object.
      */
     function updateEntities(dt) {
-        allEnemies.forEach(function(enemy) {
+        that.allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
-        player.update();
+        that.player.update();
     }
     /* This function will remove any enemies that have
      * already moved across the screen. Since they are
@@ -95,9 +137,9 @@ LiveGame.prototype.update = function (dt) {
      * when the garbage collector is called.
      */
     function pruneEnemies() {
-        allEnemies.forEach(function(enemy, index) {
+        that.allEnemies.forEach(function(enemy, index) {
             if (enemy.x > gameConstants.canvasWidth) {
-                allEnemies.splice(index, 1);
+                that.allEnemies.splice(index, 1);
             }
         });
     }
@@ -107,18 +149,30 @@ LiveGame.prototype.update = function (dt) {
      * player to the starting position
      */
     function checkCollisions() {
-        allEnemies.forEach(function (enemy) {
-            if (isCollision(player.getBoundingBox(), enemy.getBoundingBox())) {
-                player.x = gameConstants.player.startX;
-                player.y = gameConstants.player.startY;
+        var playerBB = that.player.getBoundingBox();
+
+        that.allEnemies.forEach(function (enemy) {
+            if (isCollision(playerBB, enemy.getBoundingBox())) {
+                that.player.x = gameConstants.player.startX;
+                that.player.y = gameConstants.player.startY;
+                that.player.lives--;
+
+                if (that.player.lives <= 0) {
+                    that.gameOver = true;
+                }
             };
         })
         that.allGems.forEach(function (gem, index) {
-            if (isCollision(player.getBoundingBox(), gem.getBoundingBox())) {
+            if (isCollision(playerBB, gem.getBoundingBox())) {
                 that.allGems.splice(index, 1);
-                player.score+=1000;
+                that.player.score+=1000;
             }
         });
+        if (isCollision(playerBB, that.key.getBoundingBox())) {
+            that.player.score+=10000;
+            that.gameOver = true;
+            that.key = null;
+        }
     }
 
     /* Utility method to take two entities and check to see if
@@ -136,13 +190,14 @@ LiveGame.prototype.update = function (dt) {
         return collision;
     }
 };
+
 /* State specific render logic which draws the backgrounds, characters,
  * score, game clock etc.
  */
 LiveGame.prototype.render = function (ctx) {
     var that = this;
-    /*
-     * clear the canvas before drawing again
+
+    /* clear the canvas before drawing again
      */
     ctx.clearRect(0, 0, gameConstants.canvasWidth, gameConstants.canvasHeight);
     /* This array holds the relative URL to the image used
@@ -177,13 +232,22 @@ LiveGame.prototype.render = function (ctx) {
         }
     }
 
+    var textY = 44;
     ctx.font = '50px impact';
     // Display the current game clock
     var displayTime = that.gameClock > 0 ? Math.abs(Math.floor(that.gameClock)) : 0;
-    ctx.fillText(displayTime, 0, 40);
+    ctx.fillText(displayTime, 0, textY);
 
     // Display the current player score
-    ctx.fillText(getDisplayScore(player.score), 345, 40);
+    that.maxScore = 999999;
+    var displayScore = that.player.score > that.maxScore ? that.maxScore : getDisplayScore(that.player.score);
+    ctx.fillText(displayScore, 345, textY);
+
+    // Display the player number of lives (with a heart!)
+    ctx.drawImage(Resources.get('images/Heart.png'), 210, -15, 40.4, 68.4);
+    ctx.fillText(that.player.lives, 250, textY);
+
+    // Render all of the entities objects for this screen
     renderEntities();
 
     /* Helper function to get the score in a format suitable for
@@ -206,29 +270,58 @@ LiveGame.prototype.render = function (ctx) {
      * on your enemy and player entities within app.js
      */
     function renderEntities() {
-        /* Loop through all of the objects within the allEnemies array and call
-         * the render function you have defined.
-         */
-        allEnemies.forEach(function (enemy) {
+        // Render the enemies
+        that.allEnemies.forEach(function (enemy) {
             enemy.render();
         });
 
+        // Render the gems
         that.allGems.forEach(function (gem) {
             gem.render();
         });
-        player.render();
+
+        // Render the player
+        that.player.render();
+
+        // Only render the key if they have collected all the gems
+        if (that.allGems.length === 0 && that.key) {
+            that.key.render();
+        }
     }
 };
 
+/* This function will take the key input and help
+ * control the state
+ */
 LiveGame.prototype.handleInput = function (key) {
     var allowedKeys = {
         37: 'left',
         38: 'up',
         39: 'right',
-        40: 'down'
+        40: 'down',
+        80: 'pause',
+        81: 'quit',
+        82: 'reset'
     };
+    var selection = allowedKeys[key];
 
-    if (!this.gameOver) {
-        player.handleInput(allowedKeys[key]);
+    if(selection === 'pause') { //pause
+        this.paused = !this.paused;
+    } else if(selection === 'quit') {
+        this.reset();
+        game.stateIndex = gameState.MAIN_MENU
     }
+    else if(selection === 'reset') {
+        this.reset();
+    } else {
+        // If the game is over or paused, don't delegate input processing
+        if (!this.gameOver && !this.paused) {
+            this.player.handleInput(selection);
+        }
+    }
+};
+/* Resets this game state back to the starting values
+ */
+LiveGame.prototype.reset = function () {
+    liveGameUtils.init.call(this);
 };

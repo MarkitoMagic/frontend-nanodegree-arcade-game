@@ -9,6 +9,7 @@ var Player = function () {
     // (x => middle tile, y => base of the tile)
     this.x = gameConstants.player.startX;
     this.y = gameConstants.player.startY;
+    this.lives = 3;
     this.boundingBox = {
         w: 70,
         h: 80,

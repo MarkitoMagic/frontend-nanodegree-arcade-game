@@ -39,15 +39,7 @@ var Gem = function (type) {
         yOff: 35
     };
 };
-Gem.prototype.updateCoords = function () {
-    // Choose a random start column
-    var col = Math.floor((Math.random() * 3) + 1);
-    this.x = gameConstants.gem.width * col;
 
-    // Choose a random start row
-    var row = Math.floor((Math.random() * 3) + 1);
-    this.y = (gameConstants.tileHeight * row)  - gameConstants.yOffSet;
-}
 /*
  * Make the Gem a subclass of the Entity object
  * and set the prototype for the object accordingly

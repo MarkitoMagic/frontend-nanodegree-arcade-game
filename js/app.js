@@ -19,7 +19,7 @@ var gameConstants = {
         yOffSet: 25,
         xOffSet: 15
     },
-    debug: true,
+    debug: false,
     keys: {
         LEFT: 'left',
         UP: 'up',
@@ -38,7 +38,8 @@ var gameState = {
 // Define game values
 var game = {
     stateIndex: 1,
-    currentState: undefined
+    currentState: undefined,
+    winner: false
 };
 
 /*
@@ -50,13 +51,3 @@ function logCoords(entity) {
         console.log('(' + entity.x + ',' + entity.y + ')');
     }
 }
-
-/*
- * All of the enemies for the game will be stored in this array
- */
-var allEnemies = [];
-
-/*
- * The main player object
- */
-var player = new Player();
