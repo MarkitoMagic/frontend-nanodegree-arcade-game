@@ -1,15 +1,17 @@
+/* globals Enemy, Player, Key, Gem, Resources, State, gameConstants, gameState, game */
+
 /* LiveGame
  *
  * The game state that will house the primary objectives of the game and handle
  * the user and handleInput.
  */
-var LiveGame = function () {
+var LiveGame = function() {
     liveGameUtils.init.call(this);
 };
 
 // Utils object to no polute the namespace with another function named init
 var liveGameUtils = {
-    init: function () {
+    init: function() {
         this.gameClock = 60;
         this.gameOver = false;
         this.allGems = [];
@@ -32,6 +34,8 @@ var liveGameUtils = {
         createGem(1, this.allGems);
         createGem(2, this.allGems);
         createGem(3, this.allGems);
+
+        this.numGems = this.allGems.length;
         this.key = new Key();
 
         //This helper function aides in preventing gems from generating in the same place
@@ -45,12 +49,12 @@ var liveGameUtils = {
 
                 // Check to see if any other gems have the same coords
                 for (i = 0; i < gemArray.length; i++) {
-                    if (tmp.x === gemArray[i].x && tmp.y === gemArray[i].y) {
+                    if(tmp.x === gemArray[i].x && tmp.y === gemArray[i].y) {
                         conflict = true;
                         break;
                     }
                 }
-                if (conflict) {
+                if(conflict) {
                     tmp = new Gem(type);
                 } else {
                     gemArray.push(tmp);
@@ -69,10 +73,10 @@ LiveGame.prototype.constructor = LiveGame;
  * componenets for an actual gameplay level. These updates include
  * updating the game clock, enemy management and collision detection.
  */
-LiveGame.prototype.update = function (dt) {
+LiveGame.prototype.update = function(dt) {
     var that = this;
 
-    if (!that.gameOver && !that.paused) {
+    if(!that.gameOver && !that.paused) {
         sendWaveOfEnemies();
         updateEntities(dt);
         checkCollisions();
@@ -80,16 +84,16 @@ LiveGame.prototype.update = function (dt) {
     }
 
     // If the game is paused, we want to handle timelapse differently
-    if (!that.paused && !that.gameOver) {
+    if(!that.paused && !that.gameOver) {
         updateGameClock(dt);
     } else {
         updateGameClock(0);
     }
 
-    if (that.gameOver) {
+    if(that.gameOver) {
         // If they won the game then set the winner status
         // for the game state
-        if (that.gameClock > 0 && that.player.lives > 0) {
+        if(that.gameClock > 0 && that.player.lives > 0) {
             game.winner = true;
         } else {
             game.winner = false;
@@ -103,7 +107,7 @@ LiveGame.prototype.update = function (dt) {
      * level
      */
     function updateGameClock(dt) {
-        if (that.gameClock > 0) {
+        if(that.gameClock > 0) {
             that.gameClock = that.gameClock - dt;
         } else {
             that.gameOver = true;
@@ -114,8 +118,17 @@ LiveGame.prototype.update = function (dt) {
      * more enemies to attack the user
      */
     function sendWaveOfEnemies() {
-        if (that.allEnemies.length < 3) {
-            that.allEnemies.push(new Enemy());
+        var enemy;
+        var boost = that.numGems - that.allGems.length;
+
+        if(boost === 0) {
+            boost = 1;
+        }
+
+        if(that.allEnemies.length < 3) {
+            enemy = new Enemy();
+            enemy.speed = enemy.speed * boost;
+            that.allEnemies.push(enemy);
         }
     }
 
@@ -138,7 +151,7 @@ LiveGame.prototype.update = function (dt) {
      */
     function pruneEnemies() {
         that.allEnemies.forEach(function(enemy, index) {
-            if (enemy.x > gameConstants.canvasWidth) {
+            if(enemy.x > gameConstants.canvasWidth) {
                 that.allEnemies.splice(index, 1);
             }
         });
@@ -151,27 +164,32 @@ LiveGame.prototype.update = function (dt) {
     function checkCollisions() {
         var playerBB = that.player.getBoundingBox();
 
-        that.allEnemies.forEach(function (enemy) {
-            if (isCollision(playerBB, enemy.getBoundingBox())) {
+        that.allEnemies.forEach(function(enemy) {
+            if(isCollision(playerBB, enemy.getBoundingBox())) {
                 that.player.x = gameConstants.player.startX;
                 that.player.y = gameConstants.player.startY;
                 that.player.lives--;
+                Resources.play('enemy-hit');
 
-                if (that.player.lives <= 0) {
+                if(that.player.lives <= 0) {
                     that.gameOver = true;
                 }
-            };
-        })
-        that.allGems.forEach(function (gem, index) {
-            if (isCollision(playerBB, gem.getBoundingBox())) {
-                that.allGems.splice(index, 1);
-                that.player.score+=1000;
             }
         });
-        if (isCollision(playerBB, that.key.getBoundingBox())) {
+
+        that.allGems.forEach(function(gem, index) {
+            if(isCollision(playerBB, gem.getBoundingBox())) {
+                that.allGems.splice(index, 1);
+                that.player.score+=1000;
+                Resources.play('collect-coin');
+            }
+        });
+
+        if(isCollision(playerBB, that.key.getBoundingBox())) {
             that.player.score+=10000;
             that.gameOver = true;
             that.key = null;
+            Resources.play('success');
         }
     }
 
@@ -181,7 +199,7 @@ LiveGame.prototype.update = function (dt) {
     function isCollision(entityOneBox, entityTwoBox) {
         var collision = false;
 
-        if (entityOneBox.x < (entityTwoBox.x + entityTwoBox.w) &&
+        if(entityOneBox.x < (entityTwoBox.x + entityTwoBox.w) &&
             entityTwoBox.x < (entityOneBox.x + entityOneBox.w) &&
             entityOneBox.y < (entityTwoBox.y + entityTwoBox.h) &&
             entityTwoBox.y < (entityOneBox.y + entityOneBox.h)) {
@@ -194,7 +212,7 @@ LiveGame.prototype.update = function (dt) {
 /* State specific render logic which draws the backgrounds, characters,
  * score, game clock etc.
  */
-LiveGame.prototype.render = function (ctx) {
+LiveGame.prototype.render = function(ctx) {
     var that = this;
 
     /* clear the canvas before drawing again
@@ -203,32 +221,22 @@ LiveGame.prototype.render = function (ctx) {
     /* This array holds the relative URL to the image used
      * for that particular row of the game level.
      */
-    var rowImages = [
-            'images/water-block.png',   // Top row is water
-            'images/stone-block.png',   // Row 1 of 3 of stone
-            'images/stone-block.png',   // Row 2 of 3 of stone
-            'images/stone-block.png',   // Row 3 of 3 of stone
-            'images/grass-block.png',   // Row 1 of 2 of grass
-            'images/grass-block.png'    // Row 2 of 2 of grass
-        ],
-        numRows = 6,
-        numCols = 5,
-        row, col;
+    var row, col;
 
-    /* Loop through the number of rows and columns we've defined above
-     * and, using the rowImages array, draw the correct image for that
-     * portion of the "grid"
-     */
-    for (row = 0; row < numRows; row++) {
-        for (col = 0; col < numCols; col++) {
-            /* The drawImage function of the canvas' context element
-             * requires 3 parameters: the image to draw, the x coordinate
-             * to start drawing and the y coordinate to start drawing.
-             * We're using our Resources helpers to refer to our images
-             * so that we get the benefits of caching these images, since
-             * we're using them over and over.
-             */
-            ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
+    var levelGrid = [
+        ['w', 'w', 'w', 'w', 'w'],
+        ['s', 's', 's', 's', 's'],
+        ['s', 's', 's', 's', 's'],
+        ['s', 's', 's', 's', 's'],
+        ['g', 'g', 'g', 'g', 'g'],
+        ['g', 'g', 'g', 'g', 'g']
+    ];
+
+    // Loop through the levelGrid for the current level - we now have
+    // dynamic levels.
+    for (row = 0; row < levelGrid.length; row++) {
+        for (col = 0; col < levelGrid[row].length; col++) {
+            ctx.drawImage(Resources.get(gameConstants.level[levelGrid[row][col]]), col * 101, row * 83);
         }
     }
 
@@ -244,7 +252,7 @@ LiveGame.prototype.render = function (ctx) {
     ctx.fillText(displayScore, 345, textY);
 
     // Display the player number of lives (with a heart!)
-    ctx.drawImage(Resources.get('images/Heart.png'), 210, -15, 40.4, 68.4);
+    ctx.drawImage(Resources.get('heart'), 210, -15, 40.4, 68.4);
     ctx.fillText(that.player.lives, 250, textY);
 
     // Render all of the entities objects for this screen
@@ -271,12 +279,12 @@ LiveGame.prototype.render = function (ctx) {
      */
     function renderEntities() {
         // Render the enemies
-        that.allEnemies.forEach(function (enemy) {
+        that.allEnemies.forEach(function(enemy) {
             enemy.render();
         });
 
         // Render the gems
-        that.allGems.forEach(function (gem) {
+        that.allGems.forEach(function(gem) {
             gem.render();
         });
 
@@ -284,7 +292,7 @@ LiveGame.prototype.render = function (ctx) {
         that.player.render();
 
         // Only render the key if they have collected all the gems
-        if (that.allGems.length === 0 && that.key) {
+        if(that.allGems.length === 0 && that.key) {
             that.key.render();
         }
     }
@@ -293,7 +301,7 @@ LiveGame.prototype.render = function (ctx) {
 /* This function will take the key input and help
  * control the state
  */
-LiveGame.prototype.handleInput = function (key) {
+LiveGame.prototype.handleInput = function(key) {
     var allowedKeys = {
         37: 'left',
         38: 'up',
@@ -309,19 +317,19 @@ LiveGame.prototype.handleInput = function (key) {
         this.paused = !this.paused;
     } else if(selection === 'quit') {
         this.reset();
-        game.stateIndex = gameState.MAIN_MENU
+        game.stateIndex = gameState.MAIN_MENU;
     }
     else if(selection === 'reset') {
         this.reset();
     } else {
         // If the game is over or paused, don't delegate input processing
-        if (!this.gameOver && !this.paused) {
+        if(!this.gameOver && !this.paused) {
             this.player.handleInput(selection);
         }
     }
 };
 /* Resets this game state back to the starting values
  */
-LiveGame.prototype.reset = function () {
+LiveGame.prototype.reset = function() {
     liveGameUtils.init.call(this);
 };

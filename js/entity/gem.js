@@ -1,3 +1,5 @@
+/* globals gameConstants, Entity */
+
 /*
  * Gem
  *
@@ -51,6 +53,6 @@ Gem.prototype.constructor = Gem;
  * Update the Gem's position, required method for game
  * Parameter: dt, a time delta between ticks
  */
-Gem.prototype.update = function (dt) {
+Gem.prototype.update = function () {
     //noop()
 };

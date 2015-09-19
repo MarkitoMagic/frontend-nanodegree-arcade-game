@@ -2,10 +2,23 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Effective JavaScript: Frogger</title>
+    <title>Bug Crossing</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- Progress Bar -->
+    <div id="progress-container">
+        <div>Get Ready For Awesome! Loading...</div>
+        <progress id="progress-bar" value="0" max="100">
+            <span id="no-support-progress"></span>
+        </progress>
+    </div>
+
+    <!-- Load the resources -->
+    <script src="https://code.createjs.com/preloadjs-0.6.1.min.js"></script>
+    <script src="https://code.createjs.com/soundjs-0.6.1.min.js"></script>
     <script src="js/resources.js"></script>
     <script src="js/entity/entity.js"></script>
     <script src="js/entity/enemy.js"></script>

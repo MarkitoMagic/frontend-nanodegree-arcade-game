@@ -1,3 +1,5 @@
+/* globals MainMenu, LiveGame, GameOver, AvatarSelect, Resources, gameState, game */
+
 /* Engine.js
  * This file provides the game loop functionality (update entities and render),
  * draws the initial game board on the screen, and then calls the update and
@@ -13,8 +15,9 @@
  * the canvas' context (ctx) object globally available to make writing app.js
  * a little simpler to work with.
  */
+var Engine;
 
-var Engine = (function(global) {
+Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
@@ -41,7 +44,7 @@ var Engine = (function(global) {
 
     // This listens for key presses and sends the keys to your
     // Player.handleInput() method. You don't need to modify this.
-    document.addEventListener('keyup', function(e) {
+    doc.addEventListener('keyup', function(e) {
         game.currentState.handleInput(e.keyCode);
     });
 
@@ -116,36 +119,40 @@ var Engine = (function(global) {
         // noop
     }
 
-    /* Go ahead and load all of the images we know we're going to need to
-     * draw our game level. Then set init as the callback method, so that when
-     * all of these images are properly loaded our game will start.
-     */
-    Resources.load([
-        'images/stone-block.png',
-        'images/water-block.png',
-        'images/grass-block.png',
-        'images/enemy-bug.png',
-        'images/char-boy.png',
-        'images/title-background.png',
-        'images/Press-Enter.png',
-        'images/Bug-Crossing.png',
-        'images/Gem Blue.png',
-        'images/Gem Green.png',
-        'images/Gem Orange.png',
-        'images/Heart.png',
-        'images/Key.png',
-        'images/char-cat-girl.png',
-        'images/char-horn-girl.png',
-        'images/char-pink-girl.png',
-        'images/char-princess-girl.png',
-        'images/Selector.png',
-        'images/player-select.png',
-        'images/are-you-sure.png',
-        'images/you-win.png',
-        'images/game-over.png',
-        'images/try-again.png'
-    ]);
     Resources.onReady(init);
+
+    Resources.load([
+        {id: 'stone-block', src: 'images/stone-block.png'},
+        {id: 'water-block', src: 'images/water-block.png'},
+        {id: 'grass-block', src: 'images/grass-block.png'},
+        {id: 'enemy-bug', src: 'images/enemy-bug.png'},
+        {id: 'char-boy', src: 'images/char-boy.png'},
+        {id: 'title-background', src: 'images/title-background.png'},
+        {id: 'press-enter', src: 'images/Press-Enter.png'},
+        {id: 'bug-crossing', src: 'images/Bug-Crossing.png'},
+        {id: 'blue-gem', src: 'images/Gem Blue.png'},
+        {id: 'green-gem', src: 'images/Gem Green.png'},
+        {id: 'orange-gem', src: 'images/Gem Orange.png'},
+        {id: 'heart', src: 'images/Heart.png'},
+        {id: 'key', src: 'images/Key.png'},
+        {id: 'char-cat-girl', src: 'images/char-cat-girl.png'},
+        {id: 'char-horn-girl', src: 'images/char-horn-girl.png'},
+        {id: 'char-pink-girl', src: 'images/char-pink-girl.png'},
+        {id: 'char-princess-girl', src: 'images/char-princess-girl.png'},
+        {id: 'selector', src: 'images/Selector.png'},
+        {id: 'player-select', src: 'images/player-select.png'},
+        {id: 'are-you-sure', src: 'images/are-you-sure.png'},
+        {id: 'you-win', src: 'images/you-win.png'},
+        {id: 'game-over', src: 'images/game-over.png'},
+        {id: 'try-again', src: 'images/try-again.png'},
+
+        {id: 'collect-coin', src: 'audio/135936__bradwesson__collectcoin.wav'},
+        {id: 'click', src: 'audio/164642__adam-n__pen-click-2.wav'},
+        {id: 'menu-select', src: 'audio/150222__killkhan__menu-select.mp3'},
+        {id: 'enemy-hit', src: 'audio/220000__b-lamerichs__43.wav'},
+        {id: 'main-menu-select', src: 'audio/140507__blackstalian__click-sfx4a.wav'},
+        {id: 'success', src: 'audio/320652__rhodesmas__success-02.wav'}
+    ]);
 
     /* Assign the canvas' context object to the global variable (the window
      * object when run in a browser) so that developer's can use it more easily

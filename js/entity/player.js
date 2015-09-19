@@ -1,8 +1,9 @@
-/**
- * Player class that represents the main character
+/* globals Entity, gameConstants */
+
+/* Player class that represents the main character
  * of the game.
  */
-var Player = function () {
+var Player = function() {
     // Default player Representation
     this.sprite = 'images/char-boy.png';
     // Default player coordinates
@@ -17,34 +18,31 @@ var Player = function () {
         yOff: 62.5
     };
     this.score = 0;
+    this.gridPosition = {
+        x: 2,
+        y: 5,
+    };
 };
 
-/*
- * Make the player a subclass of the Entity object
+/* Make the player a subclass of the Entity object
  * and set the prototype for the object accordingly
  */
 Player.prototype = Object.create(Entity.prototype);
 Player.prototype.constructor = Player;
 
-/**
- * Define the player prototype (although, in THIS version it's a one player game)
+/* update the player, could be used to implement other gameplay
+ * features
  */
-Player.prototype.update = function( dt) {
+Player.prototype.update = function() {
     //noop()
 };
-
 
 /**
  * handles user's input for the game
  * to allow the player to control the
  * character
  */
- Player.prototype.handleInput = function (key) {
-     // Get a reference to the sprite for the character image
-     var heroSprite = Resources.get(this.sprite);
-     var heroWidth = heroSprite.height;
-     var heroHeigt = heroSprite.width;
-
+ Player.prototype.handleInput = function(key) {
      // Calculate the distance for each character move
      var xMoveDistance = gameConstants.tileWidth;
      var yMoveDistance = gameConstants.tileHeight;
@@ -73,6 +71,4 @@ Player.prototype.update = function( dt) {
          this.x = heroFutureX;
          this.y = heroFutureY;
      }
-
-     logCoords(this);
  };

@@ -1,5 +1,6 @@
-/*
- * Enemy
+/* globals gameConstants, Entity */
+
+/* Enemy
  *
  * The enemy object represents the main obstacles in the game
  * They are collision enabled and contact with the main player

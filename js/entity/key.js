@@ -1,9 +1,11 @@
+/* globals Entity */
+
 /* Key
  *
  * The KEY entity game object is the end-goal for the players for a given level.
  */
 
- var Key = function () {
+ var Key = function() {
      this.x = 0;
      this.y = 0;
      this.sprite = 'images/Key.png';
