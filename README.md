@@ -17,12 +17,12 @@ HOW TO PLAY
 
 #Controls
 Moving
-    Up (Up Arrow)
-    Down (Down Arrow)
-    Left (Left Arrow)
-    Right (Right Arrow)
-    Pause (P)
-    Quit (Q)
+    - Up (Up Arrow)
+    - Down (Down Arrow)
+    - Left (Left Arrow)
+    - Right (Right Arrow)
+    - Pause (P)
+    - Quit (Q)
 
 #Objective
 Collect all three gems in each level to reveal the key! Collect the key to complete the level!
