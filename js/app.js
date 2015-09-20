@@ -41,23 +41,21 @@
 
     // Define the game states
     window.gameState = {
-        MAIN_MENU: 1,
-        LIVE_GAME: 2,
-        GAME_OVER: 3,
-        AVATAR_SELECT: 4
+        MAIN_MENU: 'main-menu',
+        LIVE_GAME: 'live-game',
+        GAME_OVER: 'game-over',
+        AVATAR_SELECT: 'avatar-select'
     };
 
     // Define game values
     window.game = {
-        stateIndex: 1,
-        currentState: undefined,
         winner: false,
         renderGrid: function (grid, ctx) {
             var row, col;
 
             for (row = 0; row < grid.length; row++) {
                 for (col = 0; col < grid[row].length; col++) {
-                    ctx.drawImage(Resources.get(gameConstants.level[grid[row][col]]), col * 101, row * 83);
+                    ctx.drawImage(Resources.get(window.gameConstants.level[grid[row][col]]), col * 101, row * 83);
                 }
             }
         }

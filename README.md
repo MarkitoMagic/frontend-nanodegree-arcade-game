@@ -17,12 +17,13 @@ HOW TO PLAY
 
 #Controls
 Moving
-    - Up (Up Arrow)
-    - Down (Down Arrow)
-    - Left (Left Arrow)
-    - Right (Right Arrow)
-    - Pause (P)
-    - Quit (Q)
+- Up (Up Arrow)
+- Down (Down Arrow)
+- Left (Left Arrow)
+- Right (Right Arrow)
+- Pause (P)
+- Quit (Q)
+- RETRY Current Level (R)
 
 #Objective
 Collect all three gems in each level to reveal the key! Collect the key to complete the level!
@@ -38,3 +39,6 @@ WORKS CITED / RESOURCES
 * [220000__b-lamerichs__43.wav](http://www.freesound.org/people/B_Lamerichs/sounds/220000/) This work is licensed under the [Creative Commons 0 License.](https://creativecommons.org/publicdomain/zero/1.0/legalcode)
 * [140507__blackstalian__click-sfx4a.wav](http://www.freesound.org/people/blackstalian/sounds/140512/) This work is licensed under the [Creative Commons 0 License.](https://creativecommons.org/publicdomain/zero/1.0/legalcode)
 * [320652__rhodesmas__success-02.wav](http://www.freesound.org/people/rhodesmas/sounds/320652/) This work is licensed under the [Attribution License.](https://creativecommons.org/licenses/by/2.0/legalcode)
+* [177123__rdholder__2dogsound-player-death1-4s-2013jan31-cc-by-30-us.wav](http://freesound.org/people/rdholder/sounds/177123/) This work is licensed under the [Attribution License.](https://creativecommons.org/licenses/by/2.0/legalcode)
+* [244005__mickleness__arcade-game-loop-intro.mp3](http://freesound.org/people/mickleness/sounds/244005/) This work is licensed under the [Attribution License.](https://creativecommons.org/licenses/by/2.0/legalcode)
+* [266014__dasrealized__fast-crawling-bu.wav](http://freesound.org/people/dasrealized/sounds/266014/) This work is licensed under the [Creative Commons 0 License.](https://creativecommons.org/publicdomain/zero/1.0/legalcode)

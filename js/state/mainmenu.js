@@ -1,15 +1,14 @@
-/* globals State, Resources, gameState, game */
+/* globals StateManager, State, Resources, gameState, game */
 
 /* MainMenu
  *
  * The main screen that will great the user and handleInput.
  */
-var MainMenu = function(stateIndex) {
+var MainMenu = function() {
     this.titleLogo = 'bug-crossing';
     this.enterText = 'press-enter';
     this.alphaValue = 1;
     this.alphaDirection = 1;
-    this.index = stateIndex;
     this.backgroundTiles = [
         ['w', 'w', 'w', 'w', 'w'],
         ['s', 's', 's', 's', 's'],
@@ -18,6 +17,7 @@ var MainMenu = function(stateIndex) {
         ['g', 'g', 'g', 'g', 'g'],
         ['g', 'g', 'g', 'g', 'g']
     ];
+    this.introLoopPlayed = false;
 };
 
 /* Assign the constructor and prototype for this psuedo-class */
@@ -59,13 +59,26 @@ MainMenu.prototype.update = function(dt) {
     } else {
         this.alphaValue+=(this.alphaDirection * dt);
     }
+
+    if (!this.introLoopPlayed) {
+        Resources.play('game-intro');
+        this.introLoopPlayed = true;
+    }
 };
+
 /* Handles user input which in this case will navigate the user
  * to the next state of the application.
  */
 MainMenu.prototype.handleInput = function(key) {
     if(key === 13) {
         Resources.play('main-menu-select');
-        game.stateIndex = gameState.AVATAR_SELECT;
+        StateManager.resetState(gameState.AVATAR_SELECT);
+        StateManager.setCurrentState(gameState.AVATAR_SELECT);
     }
+};
+
+MainMenu.prototype.reset = function () {
+    this.alphaValue = 1;
+    this.alphaDirection = 1;
+    this.introLoopPlayed = false;
 };

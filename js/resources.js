@@ -45,6 +45,10 @@
         createjs.Sound.play(id);
     }
 
+    function stopAll() {
+        createjs.Sound.stop();
+    }
+
     function onReady(func) {
         onReadyFunc = func;
     }
@@ -56,6 +60,7 @@
         get: get,
         load: load,
         onReady: onReady,
-        play: play
+        play: play,
+        stopAll: stopAll
     };
 })();

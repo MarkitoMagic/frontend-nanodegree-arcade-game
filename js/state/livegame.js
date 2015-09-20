@@ -1,4 +1,4 @@
-/* globals Enemy, Player, Key, Gem, Resources, State, gameConstants, gameState, game */
+/* globals Enemy, Player, Key, Gem, Resources, State, StateManager, gameConstants, gameState, game */
 
 /* LiveGame
  *
@@ -91,16 +91,21 @@ LiveGame.prototype.update = function(dt) {
     }
 
     if(that.gameOver) {
+        // Stop all currently playing sounds
+        Resources.stopAll();
+
         // If they won the game then set the winner status
         // for the game state
         if(that.gameClock > 0 && that.player.lives > 0) {
+        Resources.play('success');
             game.winner = true;
         } else {
+            Resources.play('failure');
             game.winner = false;
         }
         //transition the game over state
         this.reset();
-        game.stateIndex = gameState.GAME_OVER;
+        StateManager.setCurrentState(gameState.GAME_OVER);
     }
 
     /* This function updates the game clock for the
@@ -129,6 +134,7 @@ LiveGame.prototype.update = function(dt) {
             enemy = new Enemy();
             enemy.speed = enemy.speed * boost;
             that.allEnemies.push(enemy);
+            Resources.play('bug-crawl');
         }
     }
 
@@ -143,6 +149,7 @@ LiveGame.prototype.update = function(dt) {
         });
         that.player.update();
     }
+
     /* This function will remove any enemies that have
      * already moved across the screen. Since they are
      * out of view of the screen, we no longer need a
@@ -156,6 +163,7 @@ LiveGame.prototype.update = function(dt) {
             }
         });
     }
+
     /* Iterates through the list of enemies and checks to see
      * if the player object collides with any of the enemies.
      * In this case, if the collision happens, we'll reset the
@@ -189,7 +197,6 @@ LiveGame.prototype.update = function(dt) {
             that.player.score+=10000;
             that.gameOver = true;
             that.key = null;
-            Resources.play('success');
         }
     }
 
@@ -317,7 +324,8 @@ LiveGame.prototype.handleInput = function(key) {
         this.paused = !this.paused;
     } else if(selection === 'quit') {
         this.reset();
-        game.stateIndex = gameState.MAIN_MENU;
+        StateManager.resetState(gameState.MAIN_MENU);
+        StateManager.setCurrentState(gameState.MAIN_MENU);
     }
     else if(selection === 'reset') {
         this.reset();
@@ -328,6 +336,7 @@ LiveGame.prototype.handleInput = function(key) {
         }
     }
 };
+
 /* Resets this game state back to the starting values
  */
 LiveGame.prototype.reset = function() {

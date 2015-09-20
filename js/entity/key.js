@@ -7,7 +7,7 @@
 
  var Key = function() {
      this.x = 0;
-     this.y = 0;
+     this.y = -10;
      this.sprite = 'images/Key.png';
 
      // Define the bounding box for the Key
@@ -17,6 +17,7 @@
          xOff: 20,
          yOff: 60
      };
- }
+ };
+ 
  Key.prototype = Object.create(Entity.prototype);
  Key.prototype.constructor = Key;

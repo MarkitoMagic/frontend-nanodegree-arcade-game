@@ -1,4 +1,4 @@
-/* globals MainMenu, LiveGame, GameOver, AvatarSelect, Resources, gameState, game */
+/* globals StateManager, MainMenu, LiveGame, GameOver, AvatarSelect, Resources, gameState */
 
 /* Engine.js
  * This file provides the game loop functionality (update entities and render),
@@ -29,13 +29,11 @@ Engine = (function(global) {
         lastTime;
 
     // Define the states of the application;
-    var mainMenu = new MainMenu();
-    var liveGame =  new LiveGame();
-    var gameOver = new GameOver();
-    var avatarSelect = new AvatarSelect();
+    StateManager.registerState(gameState.MAIN_MENU, new MainMenu());
+    StateManager.registerState(gameState.LIVE_GAME, new LiveGame());
+    StateManager.registerState(gameState.GAME_OVER, new GameOver());
+    StateManager.registerState(gameState.AVATAR_SELECT, new AvatarSelect());
 
-    // Set the initial state to be the main menu
-    game.currentState = mainMenu;
 
     // Define the canvas dimensions and add it to the DOM
     canvas.width = 505;
@@ -45,7 +43,7 @@ Engine = (function(global) {
     // This listens for key presses and sends the keys to your
     // Player.handleInput() method. You don't need to modify this.
     doc.addEventListener('keyup', function(e) {
-        game.currentState.handleInput(e.keyCode);
+        StateManager.getCurrentState().handleInput(e.keyCode);
     });
 
     /* This function serves as the kickoff point for the game loop itself
@@ -61,34 +59,13 @@ Engine = (function(global) {
         var now = Date.now(),
             dt = (now - lastTime) / 1000.0;
 
-        /* Based on the state index value, choose a state Object
-         * and defer the logic for update/render/handleInput to those
-         * objects.
-         */
-        switch (game.stateIndex) {
-            case gameState.MAIN_MENU:
-                game.currentState = mainMenu;
-                break;
-            case gameState.AVATAR_SELECT:
-                game.currentState = avatarSelect;
-                break;
-            case gameState.LIVE_GAME:
-                liveGame.player.sprite = game.spriteSelection;
-                game.currentState = liveGame;
-                break;
-            case gameState.GAME_OVER:
-                game.currentState = gameOver;
-                break;
-            default:
-                game.currentState = mainMenu;
-                break;
-         }
-
          /* Call our update/render functions, pass along the time delta to
           * our update function since it may be used for smooth animation.
           */
-         game.currentState.update(dt);
-         game.currentState.render(ctx);
+         var currentState = StateManager.getCurrentState();
+
+         currentState.update(dt);
+         currentState.render(ctx);
 
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
@@ -116,7 +93,7 @@ Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+        //no op
     }
 
     Resources.onReady(init);
@@ -145,13 +122,15 @@ Engine = (function(global) {
         {id: 'you-win', src: 'images/you-win.png'},
         {id: 'game-over', src: 'images/game-over.png'},
         {id: 'try-again', src: 'images/try-again.png'},
-
         {id: 'collect-coin', src: 'audio/135936__bradwesson__collectcoin.wav'},
         {id: 'click', src: 'audio/164642__adam-n__pen-click-2.wav'},
         {id: 'menu-select', src: 'audio/150222__killkhan__menu-select.mp3'},
         {id: 'enemy-hit', src: 'audio/220000__b-lamerichs__43.wav'},
         {id: 'main-menu-select', src: 'audio/140507__blackstalian__click-sfx4a.wav'},
-        {id: 'success', src: 'audio/320652__rhodesmas__success-02.wav'}
+        {id: 'success', src: 'audio/320652__rhodesmas__success-02.wav'},
+        {id: 'failure', src: 'audio/177123__rdholder__2dogsound-player-death1-4s-2013jan31-cc-by-30-us.wav'},
+        {id: 'game-intro', src: 'audio/244005__mickleness__arcade-game-loop-intro.mp3'},
+        {id: 'bug-crawl', src: 'audio/266014__dasrealized__fast-crawling-bu.wav'}
     ]);
 
     /* Assign the canvas' context object to the global variable (the window

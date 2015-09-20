@@ -1,4 +1,4 @@
-/* globals Resources, State, gameConstants, gameState, game */
+/* globals StateManager, Resources, State, gameConstants, gameState, game */
 
 /* AvatarSelect
  *
@@ -60,6 +60,7 @@ AvatarSelect.prototype.render = function(ctx) {
 AvatarSelect.prototype.update = function() {
     // noop
 };
+
 AvatarSelect.prototype.handleInput = function(key) {
     var allowedKeys = {
         37: 'left',
@@ -77,7 +78,11 @@ AvatarSelect.prototype.handleInput = function(key) {
         Resources.play('click');
     } else if(selection === 'enter') {
         game.spriteSelection = this.cast[this.choice];
-        game.stateIndex = gameState.LIVE_GAME;
+        StateManager.setCurrentState(gameState.LIVE_GAME);
         Resources.play('menu-select');
     }
+};
+
+AvatarSelect.prototype.reset = function() {
+    this.choice = 0; // default selection
 };

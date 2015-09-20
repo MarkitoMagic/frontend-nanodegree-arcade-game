@@ -1,4 +1,4 @@
-/* globals State, gameConstants, game, Resources, gameState */
+/* globals State, StateManager, gameConstants, game, Resources, gameState */
 
 /* GameOver
  *
@@ -24,6 +24,7 @@ GameOver.prototype.constructor = GameOver;
 GameOver.prototype.update = function() {
     // no op
 };
+
 GameOver.prototype.render = function(ctx) {
     if(ctx) {
         ctx.clearRect(0, 0, gameConstants.canvasWidth, gameConstants.canvasHeight);
@@ -38,6 +39,7 @@ GameOver.prototype.render = function(ctx) {
         ctx.drawImage(Resources.get('try-again'), 95, 350);
     }
 };
+
 GameOver.prototype.handleInput = function(key) {
     var allowedKeys = {
         78: 'no',
@@ -46,8 +48,11 @@ GameOver.prototype.handleInput = function(key) {
     var selection = allowedKeys[key];
 
     if(selection === 'no') {
-        game.stateIndex = gameState.MAIN_MENU;
+        Resources.stopAll();
+        StateManager.resetState(gameState.MAIN_MENU);
+        StateManager.setCurrentState(gameState.MAIN_MENU);
     } else if(selection === 'yes'){
-        game.stateIndex = gameState.LIVE_GAME;
+        Resources.stopAll();
+        StateManager.setCurrentState(gameState.LIVE_GAME);
     }
 };
